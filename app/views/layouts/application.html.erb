@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<head>
+
+  <!-- Basic Page Needs
+  ================================================== -->
+  <meta charset="utf-8">
+  <title>Main Page - ITAelektro</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  ================================================== -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- CSS
+  ================================================== -->
+  <%= stylesheet_link_tag 'application' %>
+  <%= javascript_include_tag 'application' %>
+  <%= csrf_meta_tags %>
+  
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <!-- Favicons
+  ================================================== -->
+  <!-- link rel="shortcut icon" href="images/favicon.ico"> -->
+
+</head>
+<body>
+<!-- pop-up registration:begin -->
+<div class="pop-up_wrapper">
+  <div class="pop-up_registration">
+    <div class="title_pop-up">
+      <span>Registrace</span>
+      <div class="close_pop-up_button"></div>
+    </div>
+    <div class="switcher">
+      <ul>
+        <li class="active"><a href="#" title="">Nový zákazník</a></li>
+        <li><a href="#" title="">Firemní údaje</a></li>
+      </ul>
+    </div>
+    <form accept-charset="UTF-8" action="/users" class="new_user" id="new_user" method="post">
+      <div class="form">
+        <div>
+          <div class="label">Email (login): <span>*</span></div>
+          <div class="input_text">
+            <input id="user_email" name="user[email]" size="30" type="email" value="" style="border:none;background-color:white !important;padding-top:0" />
+          </div>
+        </div>
+        <div>
+          <div class="label">Heslo: <span>*</span></div>
+          <div class="input_text">
+            <input id="user_password" name="user[password]" size="30" type="password" style="border:none;background-color:white !important;padding-top:0" />
+          </div>
+        </div>
+        <div>
+          <div class="label">Heslo again: <span>*</span></div>
+          <div class="input_text">
+            <input id="user_password_confirmation" name="user[password_confirmation]" size="30" type="password" style="border:none;background-color:white !important;padding-top:0" />
+          </div>
+        </div>
+        <div>
+          <div class="label">Název společnosti: </div>
+          <div class="input_text">
+            <input name="user[firm]" size="30" type="password" style="border:none;background-color:white !important;padding-top:0" />
+          </div>
+        </div>
+        <div>
+          <div class="label">ICO: </div>
+          <div class="input_text">
+            <input name="user[ogrn]" size="30" type="password" style="border:none;background-color:white !important;padding-top:0" />
+          </div>
+        </div>
+        <div>
+          <a href="#" title="" class="red_big_button" onclick = "submit();">Zaregistrovat</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- pop-up registration:end -->
+
+<!-- WRAPPER PAGE:begin -->
+<div id="wrapper">
+  
+  <!-- HEADER:begin -->
+  <header class="header_page">
+
+    <!-- logotype -->
+    <a href="/" class="logotype" title=""></a>
+
+    <!-- search -->
+    <%= form_tag '/find_products', method: 'get' do %>
+      <div class="wrapper_search">
+        <div>
+        <%= text_field_tag 'query', params[:query], placeholder: 'Sem napište hledané slovo', style: 'border:none;width:200px' %>
+        </div>
+        <a href="#" onclick = "submit();false;"></a>
+      </div>
+    <% end %>                
+    
+    <!-- enter the site:begin-->
+    <div class="wrapper_enter_site">
+      <%- unless current_user %>
+        <a href="#" title="Nová registrace">Nová registrace</a>
+          <%= form_tag "/users/sign_in" do %>
+          <div class="wrapper_forms">
+            <div>
+              <div class="label">Login:</div>
+              <div class="input" style="padding:0;width:120px">
+                <input id="user_email" name="user[email]" size="30" type="email" value="" style="border:none;background-color:white !important;padding-top:3px;height:10px;margin:0;width:112px" />
+              </div>
+            </div>
+            <div>
+              <div class="label">Heslo:</div>
+              <div class="input" style="padding:0;width:120px">
+                <input id="user_password" name="user[password]" size="30" type="password" style="border:none;background-color:white !important;padding-top:3px;height:10px;margin:0;width:112px" />
+              </div>
+            </div>
+            <a href="#" class="gray_button" onclick = "submit()">Přihlásit</a>
+          </div>        
+        <% end %>
+      <%- else %>
+        <span style="font-weight:bold;margin-top:20px;display:block"><%= current_user.email %></span>
+        <%= link_to "Sign out", destroy_user_session_path, :method => :delete %>
+      <% end %>
+    </div>
+    <!-- enter the site:end-->
+
+    <!-- basket -->
+    <div class="wrapper_basket">
+      <div><span><%= @cart.quantity %></span> ks zboží: <span><%= @cart.price.round %></span> Kč</div>
+      <%- unless @cart.items == [] %>
+        <a href="/cart" class="gray_button">Pokračujte</a>
+      <% end %>
+    </div>
+
+    <div class="clear"></div>
+
+    <!-- navigation:begin -->
+    <nav>
+      <ul>
+        <%- MenuItem.all.each do |menu| %>
+        <li class="<%= menu.url == request.fullpath ? 'active' : '' %> <%= menu == MenuItem.first ? 'first' : menu == MenuItem.last ? 'last' : '';%>"><%= link_to menu.name, menu.url, title:menu.name, class:"width_189px" %></li>
+        <% end %>
+      </ul>
+    </nav>
+    <!-- navigation:end -->
+
+  </header>
+  <!-- HEADER:end -->
+
+  <!-- CONTENT:begin -->
+  <div class="content_page">
+
+    <%= yield %>    
+
+  </div>
+  <!-- CONTENT:end -->
+
+  <!-- FOOTER:begin -->
+  <footer class="footer_page">&copy; 2012 ITAelectro</footer>
+  <!-- FOOTER:end -->
+
+</div>
+<!-- WRAPPER PAGE:end -->
+
+</body>
+
+<!-- Pop-up registration window
+  ================================================== -->
+<script type="text/javascript">
+$(function(){
+  $('.wrapper_enter_site > a:first').click(function(){
+    var widthWindow = $(document).height();
+    $('.pop-up_wrapper').height(widthWindow).show();
+
+    var x = document.documentElement.clientHeight;
+    var y = $('.pop-up_registration').height();
+    var inTwoX = x/2;
+    var inToY = y/2;
+    var z = (inTwoX-inToY);
+    $('.pop-up_registration').css({'top' : z});
+  });
+  $('.title_pop-up .close_pop-up_button').click(function(){
+    $('.pop-up_wrapper').hide();
+  });
+});
+</script>
+
+</html>

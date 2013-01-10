@@ -1,0 +1,56 @@
+= render 'shared/filter'
+/ description product:begin
+.descr_product
+  / title
+  %h1.title_gray_bg= @product.title
+  / slider:begin
+  .wrapper_slide
+    #slide.slideshow
+      .img_cont
+        %ul.main_images
+          = image_tag('/assets/no_image.jpg', size: '366x366') if @product.product_images == []
+          - @product.product_images.each do |product_image|
+            %li
+              = link_to product_image.image.url, class: 'cboxElement' do
+                %span
+                = image_tag product_image.image.medium
+      .wrapper_ui
+        .prev_btn
+          %a.prev{:href => "#"}
+        .thumb_holder
+          != "<ul class='thumbs'><li class='section'><ul class='sub_section'>"
+          - @product.product_images.each_with_index do |product_image, index|
+            != "</ul></li><li class='section'><ul class='sub_section'>" if index % 3 == 0
+            %li
+              %a{:href => "javascript:void(0);"}
+                = image_tag product_image.image.thumb.url            
+          != "</ul>"
+        .next_btn
+          %a.next{:href => "#"}
+  / slider:end
+  / text description:begin
+  .text_descr
+    %ul
+      - @product.additional_top_attributes.each do |attribute|
+        %li= attribute.try(:name) + ' ' + attribute.try(:value) if attribute != ''
+    %p
+      %b Kód:
+      = @product.kod
+    - @product.additional_bottom_attributes.each do |attribute|
+      - if attribute != ''
+        %p
+          %b= attribute.try(:name) + ':'
+          = attribute.try(:value)
+    %div
+      %p
+        %i CCena bez DPH
+        %b= number_to_currency(@product.price.round, unit: ',-', separator: ',', delimiter: ' ', format: "%n%u", precision: 0)
+      %p
+        %i Cena s DPH
+        %b= number_to_currency(@product.full_price.round, unit: ',-', separator: ',', delimiter: ' ', format: "%n%u", precision: 0)
+      = form_for :cart_item, url: add_to_cart_path, method: :post do |f|
+        = f.hidden_field :product_id, value: @product.id
+        = f.hidden_field :quantity, value: 1
+        %a.red_big_button{:href => "#", :title => "", :onclick => "submit();",} Do košíku
+  / text description:begin
+/ description product:end
